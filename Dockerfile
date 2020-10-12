@@ -22,15 +22,15 @@ RUN wget https://jmeter-plugins.org/downloads/file/JMeterPlugins-ExtrasLibs-1.4.
 
 RUN mv apache-jmeter-3.1.tgz /jmeter/
 
-RUN mv JMeterPlugins-ExtrasLibs-1.4.0.zip /jmeter/
-
 RUN gzip -d /jmeter/apache-jmeter-3.1.tgz
 
 RUN mkdir -p /jmeter/apache-jmeter-3.1
 
 RUN tar xvf /jmeter/apache-jmeter-3.1.tar -C /jmeter/apache-jmeter-3.1
 
-RUN ls -ltr /jmeter/
+RUN rm /jmeter/apache-jmeter-3.1.tar
+
+RUN mv JMeterPlugins-ExtrasLibs-1.4.0.zip /jmeter/apache-jmeter-3.1/
 
 RUN unzip -o /jmeter/apache-jmeter-3.1/JMeterPlugins-ExtrasLibs-1.4.0.zip -d /jmeter/apache-jmeter-3.1/ \
     && rm -rf /jmeter/apache-jmeter-3.1/JMeterPlugins-ExtrasLibs-1.4.0.zip
