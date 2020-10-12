@@ -18,8 +18,14 @@ RUN yum repolist > /dev/null && \
 RUN mkdir -p /jmeter/{tests,results}
 
 # Install JMeter
-ADD apache-jmeter-3.1.tgz /jmeter
-ADD JMeterPlugins-ExtrasLibs-1.4.0.zip /jmeter/apache-jmeter-3.1/
+RUN wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-3.1.tgz
+RUN wget https://jmeter-plugins.org/downloads/file/JMeterPlugins-ExtrasLibs-1.4.0.zip
+
+RUN mkdir /jmeter \
+    && tar zxvf apache-jmeter-3.1.tgz
+RUN mkdir /jmeter/apache-jmeter-3.1/ \
+    && mv JMeterPlugins-ExtrasLibs-1.4.0.zip /jmeter/apache-jmeter-3.1/
+
 RUN unzip -o /jmeter/apache-jmeter-3.1/JMeterPlugins-ExtrasLibs-1.4.0.zip -d /jmeter/apache-jmeter-3.1/ \
     && rm -rf /jmeter/apache-jmeter-3.1/JMeterPlugins-ExtrasLibs-1.4.0.zip
 
