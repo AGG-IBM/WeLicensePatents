@@ -1,4 +1,4 @@
-FROM rhel7
+FROM registry.access.redhat.com/rhel7/rhel
 
 RUN yum repolist > /dev/null && \
      yum-config-manager --enable rhel-7-server-optional-rpms && \
@@ -12,3 +12,26 @@ RUN yum repolist > /dev/null && \
      yum install -y --setopt=tsflags=nodocs install $INSTALL_PKGS && \
      rpm -V $INSTALL_PKGS && \
      yum clean all
+# Create jmeter directory with tests and results folder
+RUN mkdir -p /jmeter/{tests,results}
+
+# Install JMeter
+ADD apache-jmeter-3.1.tgz /jmeter
+ADD JMeterPlugins-ExtrasLibs-1.4.0.zip /jmeter/apache-jmeter-3.1/
+RUN unzip -o /jmeter/apache-jmeter-3.1/JMeterPlugins-ExtrasLibs-1.4.0.zip -d /jmeter/apache-jmeter-3.1/ \
+    && rm -rf /jmeter/apache-jmeter-3.1/JMeterPlugins-ExtrasLibs-1.4.0.zip
+
+# Set JMeter Home
+ENV JMETER_HOME /jmeter/apache-jmeter-3.1/
+
+# Add JMeter to the Path
+ENV PATH $JMETER_HOME/bin:$PATH
+
+# Additional jars (ex. ActiveMQ) can be copied into $JMETER_HOME/bin
+# COPY activemq-all-5.10.1.jar $JMETER_HOME/bin
+
+# Copy custom user.properties file for reports dashboard to be generated
+COPY user.properties $JMETER_HOME/bin/user.properties
+
+# Set working directory
+WORKDIR /jmeter
