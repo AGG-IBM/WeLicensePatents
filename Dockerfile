@@ -26,7 +26,7 @@ RUN mv JMeterPlugins-ExtrasLibs-1.4.0.zip /jmeter/
 
 RUN gzip -d /jmeter/apache-jmeter-3.1.tgz
 
-RUN tar xvf /jmeter/apache-jmeter-3.1.tar
+RUN tar xvf /jmeter/apache-jmeter-3.1.tar -C /jmeter/apache-jmeter-3.1
 
 RUN ls -ltr /jmeter/
 
