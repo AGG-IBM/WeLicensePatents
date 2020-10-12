@@ -28,6 +28,8 @@ RUN pwd
 
 RUN ls -ltr
 
+RUN ls -ltr /jmeter/
+
 RUN gzip -d apache-jmeter-3.1.tgz
 
 RUN unzip -o /jmeter/apache-jmeter-3.1/JMeterPlugins-ExtrasLibs-1.4.0.zip -d /jmeter/apache-jmeter-3.1/ \
