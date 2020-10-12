@@ -1,28 +1,39 @@
-FROM rhscl/s2i-base-rhel7:1
-EXPOSE 8080
+FROM registry.access.redhat.com/ubi7/ubi
 
-ENV PYTHON_VERSION=3.5 \
-    PATH=$HOME/.local/bin/:$PATH
+# Install necessary packages
+RUN yum repolist > /dev/null && \
+     yum-config-manager --enable rhel-7-server-optional-rpms && \
+     yum clean all && \
+     INSTALL_PKGS="tar \
+        unzip \
+        wget \
+        which \
+        yum-utils \
+        java-1.8.0-openjdk-devel" && \
+     yum install -y --setopt=tsflags=nodocs install $INSTALL_PKGS && \
+     rpm -V $INSTALL_PKGS && \
+     yum clean all
 
-LABEL io.k8s.description="Platform for building and running Python 3.5 applications" \
-      io.k8s.display-name="Python 3.5" \
-      io.openshift.expose-services="8080:http" \
-      io.openshift.tags="builder,python,python35,rh-python35"
+# Create jmeter directory with tests and results folder
+RUN mkdir -p /jmeter/{tests,results}
 
-# Labels consumed by Red Hat build service
-LABEL Name="rhscl/python-35-rhel7" \
-      BZComponent="rh-python35-docker" \
-      Version="3.5" \
-      Release="15" \
-      Architecture="x86_64"
+# Install JMeter
+ADD apache-jmeter-3.1.tgz /jmeter
+ADD JMeterPlugins-ExtrasLibs-1.4.0.zip /jmeter/apache-jmeter-3.1/
+RUN unzip -o /jmeter/apache-jmeter-3.1/JMeterPlugins-ExtrasLibs-1.4.0.zip -d /jmeter/apache-jmeter-3.1/ \
+    && rm -rf /jmeter/apache-jmeter-3.1/JMeterPlugins-ExtrasLibs-1.4.0.zip
 
-RUN yum-config-manager --enable rhel-server-rhscl-7-rpms \
-    yum-config-manager --enable rhel-7-server-optional-rpms && \
-    yum-config-manager --enable rhel-7-server-ose-3.0-rpms && \
-    yum-config-manager --disable epel >/dev/null || : && \
-    INSTALL_PKGS="rh-python35 rh-python35-python-devel rh-python35-python-setuptools rh-python35-python-pip nss_wrapper httpd httpd-devel" && \
-    yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
-    rpm -V $INSTALL_PKGS && \
-    # Remove redhat-logos (httpd dependency) to keep image size smaller.
-    rpm -e --nodeps redhat-logos && \
-    yum clean all -y
+# Set JMeter Home
+ENV JMETER_HOME /jmeter/apache-jmeter-3.1/
+
+# Add JMeter to the Path
+ENV PATH $JMETER_HOME/bin:$PATH
+
+# Additional jars (ex. ActiveMQ) can be copied into $JMETER_HOME/bin
+# COPY activemq-all-5.10.1.jar $JMETER_HOME/bin
+
+# Copy custom user.properties file for reports dashboard to be generated
+COPY user.properties $JMETER_HOME/bin/user.properties
+
+# Set working directory
+WORKDIR /jmeter
