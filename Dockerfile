@@ -23,7 +23,8 @@ RUN wget https://jmeter-plugins.org/downloads/file/JMeterPlugins-ExtrasLibs-1.4.
 RUN mv apache-jmeter-3.1.tgz /jmeter/
 RUN ls -ltr
 RUN cd /jmeter/ && gzip -d apache-jmeter-3.1.tgz
-RUN mv JMeterPlugins-ExtrasLibs-1.4.0.zip /jmeter/apache-jmeter-3.1/
+RUN mv ../JMeterPlugins-ExtrasLibs-1.4.0.zip .
+RUN ls -ltr
 
 RUN unzip -o /jmeter/apache-jmeter-3.1/JMeterPlugins-ExtrasLibs-1.4.0.zip -d /jmeter/apache-jmeter-3.1/ \
     && rm -rf /jmeter/apache-jmeter-3.1/JMeterPlugins-ExtrasLibs-1.4.0.zip
